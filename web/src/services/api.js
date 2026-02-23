@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use environment variable or fallback to IP address
-const API_URL = import.meta.env.VITE_API_URL || 'http://192.168.100.203:5000/api';
+// Use environment variable or fallback to Render backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://shoe-store-api-yqhk.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
