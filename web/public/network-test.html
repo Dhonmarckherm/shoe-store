@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Test</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+            padding: 20px; 
+            background: #0f172a; 
+            color: #fff;
+            margin: 0;
+        }
+        .card { 
+            background: #1e293b; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        .success { border-left: 5px solid #22c55e; }
+        .error { border-left: 5px solid #ef4444; }
+        .info { border-left: 5px solid #3b82f6; }
+        button { 
+            background: #3b82f6; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #2563eb; }
+        button:active { transform: scale(0.98); }
+        pre { 
+            background: #0f172a; 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        h1 { margin-top: 0; }
+        .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-left: 10px; }
+        .status.ok { background: #22c55e; }
+        .status.fail { background: #ef4444; }
+        .log { font-family: monospace; font-size: 11px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <h1>🌐 Network Connectivity Test</h1>
+    
+    <div class="card info">
+        <h3>📱 Connection Information</h3>
+        <p><strong>Page URL:</strong> <code id="pageUrl"></code></p>
+        <p><strong>Backend Target:</strong> <code>http://192.168.100.203:5000</code></p>
+        <p><strong>API Target:</strong> <code>http://192.168.100.203:5000/api/products</code></p>
+    </div>
+
+    <div class="card">
+        <h3>🔌 Test 1: Backend Health Check</h3>
+        <button onclick="testBackend()">Test Backend Connection</button>
+        <div id="backendResult"></div>
+    </div>
+
+    <div class="card">
+        <h3>👟 Test 2: Products API</h3>
+        <button onclick="testProducts()">Test Products API</button>
+        <div id="productsResult"></div>
+    </div>
+
+    <div class="card">
+        <h3>📋 Connection Log</h3>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://192.168.100.203:5000';
+        const API_URL = 'http://192.168.100.203:5000/api/products';
+        
+        document.getElementById('pageUrl').textContent = window.location.href;
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = { info: '#3b82f6', success: '#22c55e', error: '#ef4444' };
+            logDiv.innerHTML += `<div style="color: ${colors[type] || '#94a3b8'}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function testBackend() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = '<p>⏳ Connecting to backend...</p>';
+            log('Testing backend health endpoint...', 'info');
+            
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const duration = Date.now() - startTime;
+                log(`Backend responded in ${duration}ms - Status: ${response.status}`, 'success');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Backend Connected Successfully!</h4>
+                        <p><strong>Response Time:</strong> ${duration}ms</p>
+                        <p><strong>Status:</strong> ${data.message}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                log('Backend health check PASSED', 'success');
+            } catch (error) {
+                const duration = Date.now() - startTime;
+                log(`Backend connection FAILED: ${error.message}`, 'error');
+                
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Backend Connection Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Time:</strong> ${duration}ms</p>
+                        <h5>Possible causes:</h5>
+                        <ul>
+                            <li>Backend server is not running</li>
+                            <li>Firewall is blocking port 5000</li>
+                            <li>Wrong IP address (should be 192.168.100.203)</li>
+                            <li>Phone and laptop not on same WiFi</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        async function testProducts() {
+            const resultDiv = document.getElementById('productsResult');
+            resultDiv.innerHTML = '<p>⏳ Fetching products...</p>';
+            log('Testing products API endpoint...', 'info');
+            
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(`${API_URL}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                const duration = Date.now() - startTime;
+                log(`Products API responded in ${duration}ms - Status: ${response.status}`, 'success');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const products = data.data || [];
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Products API Working!</h4>
+                        <p><strong>Response Time:</strong> ${duration}ms</p>
+                        <p><strong>Products Found:</strong> ${products.length}</p>
+                        ${products.length > 0 ? `<p><strong>First Product:</strong> ${products[0].name}</p>` : ''}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                log(`Products API PASSED - Found ${products.length} products`, 'success');
+            } catch (error) {
+                const duration = Date.now() - startTime;
+                log(`Products API FAILED: ${error.message}`, 'error');
+                
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Products API Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Time:</strong> ${duration}ms</p>
+                        <h5>Check:</h5>
+                        <ul>
+                            <li>Backend is running: <code>http://192.168.100.203:5000/health</code></li>
+                            <li>CORS is enabled on backend</li>
+                            <li>Database has products seeded</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            log('Page loaded, ready for testing', 'info');
+            setTimeout(() => {
+                log('Auto-running backend test...', 'info');
+                testBackend();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

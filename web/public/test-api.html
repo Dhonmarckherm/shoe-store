@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        .result { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { border-left: 4px solid #22c55e; }
+        .error { border-left: 4px solid #ef4444; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563eb; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>🔌 API Connection Test</h1>
+    
+    <div class="result">
+        <h3>Testing Backend Connection...</h3>
+        <button onclick="testHealth()">Test /health</button>
+        <button onclick="testProducts()">Test /api/products</button>
+        <div id="result"></div>
+    </div>
+
+    <div class="result">
+        <h3>Connection Info</h3>
+        <p><strong>Your IP:</strong> <span id="clientIp">Checking...</span></p>
+        <p><strong>API URL:</strong> http://192.168.100.203:5000/api</p>
+        <p><strong>Current Page:</strong> <span id="currentPage"></span></p>
+    </div>
+
+    <script>
+        const API_BASE = 'http://192.168.100.203:5000/api';
+        
+        document.getElementById('currentPage').textContent = window.location.href;
+        
+        // Get client IP
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(d => document.getElementById('clientIp').textContent = d.ip + ' (public)')
+            .catch(() => {
+                // Try local method
+                const pc = new RTCPeerConnection({iceServers:[]});
+                pc.createDataChannel('');
+                pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                pc.onicecandidate = e => {
+                    if (!e.candidate) return;
+                    const ip = e.candidate.candidate.match(/\d+\.\d+\.\d+\.\d+/);
+                    if (ip) {
+                        document.getElementById('clientIp').textContent = ip[0] + ' (local)';
+                        pc.close();
+                    }
+                };
+            });
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://192.168.100.203:5000/health');
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Success!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p><strong>${error.message}</strong></p>
+                        <p>Make sure:</p>
+                        <ul>
+                            <li>Backend is running on port 5000</li>
+                            <li>Firewall allows port 5000</li>
+                            <li>Your phone is on the same WiFi (192.168.100.x)</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        async function testProducts() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing products API...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
+                const products = data.data || [];
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Success! Found ${products.length} products</h4>
+                        <p>First product: <strong>${products[0]?.name || 'N/A'}</strong></p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p><strong>${error.message}</strong></p>
+                        <p>Check CORS configuration on backend.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

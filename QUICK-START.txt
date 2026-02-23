@@ -1,0 +1,101 @@
+================================================================================
+                    SHOE STORE - FACE RECOGNITION SETUP
+================================================================================
+
+⚠️  ERROR: "unable to access camera. undefined is not an object..."
+
+    YOU ARE RUNNING THE APP IN A WEB BROWSER!
+    Face recognition does NOT work in web browsers on mobile.
+
+================================================================================
+                           QUICK FIX (3 STEPS)
+================================================================================
+
+STEP 1: INSTALL EXPO GO
+------------------------
+Scan this QR code with your phone's regular camera app:
+
+    iOS:     https://apps.apple.com/app/expo-go/id982107779
+    Android: https://play.google.com/store/apps/details?id=host.exp.exponent
+
+
+STEP 2: OPEN EXPO GO (NOT BROWSER!)
+------------------------------------
+❌ WRONG: Pressing 'w' in terminal → Opens in browser → CAMERA WON'T WORK
+❌ WRONG: Clicking "Open in browser" → CAMERA WON'T WORK
+❌ WRONG: Typing localhost in Chrome → CAMERA WON'T WORK
+
+✅ CORRECT: 
+    1. Open the "Expo Go" app on your phone (NOT Chrome/Safari!)
+    2. Look at your computer screen for the QR code
+    3. Use Expo Go to scan the QR code
+    4. App loads in Expo Go → CAMERA WORKS!
+
+
+STEP 3: USE FACE RECOGNITION
+-----------------------------
+1. Create account with email/password
+2. When prompted, tap "Set Up" face recognition
+3. Allow camera permission
+4. Position face in oval
+5. Tap camera button
+
+
+================================================================================
+                          HOW TO VERIFY IT'S WORKING
+================================================================================
+
+✅ YOU'RE IN EXPO GO (CORRECT) IF:
+   - No browser URL bar at top/bottom
+   - Full-screen app experience
+   - App name shows "ShoeStore" 
+   - Camera permission prompt looks native
+   - Face recognition works!
+
+❌ YOU'RE IN BROWSER (WRONG) IF:
+   - You see browser URL bar
+   - You pressed 'w' in terminal
+   - You see Chrome/Safari interface
+   - Error about "navigator.mediaDevices"
+   - Camera doesn't work
+
+
+================================================================================
+                          TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "Can't connect to backend"
+SOLUTION: Make sure phone and computer are on same Wi-Fi network
+
+PROBLEM: "Camera permission denied"  
+SOLUTION: Go to Settings → Expo Go → Enable Camera
+
+PROBLEM: "Still getting error"
+SOLUTION: 
+    1. Close browser completely
+    2. Close Expo Go app completely
+    3. Reopen Expo Go app
+    4. Scan QR code again
+
+
+================================================================================
+                          CURRENT STATUS
+================================================================================
+
+Backend (HTTPS):  https://10.111.5.200:5000  [RUNNING]
+Web App:          http://localhost:5173      [RUNNING]
+Mobile (Expo):    Check Expo terminal window for QR code
+
+The Expo tunnel URL will be shown in the Expo PowerShell window.
+It will look like: exp://tunnel.ngrok.io:443
+
+
+================================================================================
+                          REMEMBER
+================================================================================
+
+    📱 Use EXPO GO APP, NOT web browser!
+    🚫 Never press 'w' in the terminal!
+    ✅ Scan QR code with Expo Go app only!
+
+================================================================================
