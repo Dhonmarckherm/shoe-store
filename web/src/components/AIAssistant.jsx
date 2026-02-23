@@ -321,10 +321,6 @@ const AIAssistant = () => {
                       maxWidth: '80%',
                       padding: '12px 16px',
                       borderRadius: '16px',
-                      backgroundColor:
-                        message.type === 'user'
-                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                          : 'white',
                       background:
                         message.type === 'user'
                           ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
@@ -338,22 +334,6 @@ const AIAssistant = () => {
                         message.type === 'user' ? '4px' : '16px',
                       borderBottomLeftRadius:
                         message.type === 'bot' ? '4px' : '16px',
-                  }}
-                    style={{
-                      ...{
-                        maxWidth: '80%',
-                        padding: '12px 16px',
-                        borderRadius: '16px',
-                        background:
-                          message.type === 'user'
-                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                            : 'white',
-                        color: message.type === 'user' ? 'white' : '#333',
-                        boxShadow:
-                          message.type === 'user'
-                            ? '0 2px 8px rgba(102, 126, 234, 0.3)'
-                            : '0 2px 8px rgba(0, 0, 0, 0.08)',
-                      },
                       borderTopRightRadius:
                         message.type === 'user' ? '4px' : '16px',
                       borderTopLeftRadius:
