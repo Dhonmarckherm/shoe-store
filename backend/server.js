@@ -17,8 +17,10 @@ const assistantRoutes = require('./src/routes/assistantRoutes');
 // Initialize app
 const app = express();
 
-// Connect to database
-connectDB();
+// Connect to database (lazy connection for serverless)
+if (!process.env.VERCEL) {
+  connectDB();
+}
 
 // Security middleware
 app.use(helmet());
@@ -139,21 +141,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+// Start server (only if not running in serverless/Vercel)
 const PORT = process.env.PORT || 5000;
-const HOST = process.env.HOST || '0.0.0.0'; // Listen on all network interfaces
+const HOST = process.env.HOST || '0.0.0.0';
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true';
 
 let server;
 
-if (HTTPS_ENABLED) {
-  const https = require('https');
-  const fs = require('fs');
-  const path = require('path');
+// Skip server startup in Vercel/serverless environments
+if (!process.env.VERCEL && !process.env.CF_PAGES) {
+  if (HTTPS_ENABLED) {
+    const https = require('https');
+    const fs = require('fs');
+    const path = require('path');
   
   const certPath = path.join(__dirname, 'certificates', 'cert.pem');
   const keyPath = path.join(__dirname, 'certificates', 'key.pem');
-  
+
   // Check if certificates exist
   if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
     console.error('SSL certificates not found! Run: node generate-ssl-cert.js');
@@ -166,22 +170,16 @@ if (HTTPS_ENABLED) {
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath)
     };
-    
+
     server = https.createServer(httpsOptions, app);
     server.listen(PORT, HOST, () => {
       console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on ${HOST}:${PORT} (HTTPS)`);
-      console.log(`Local access: https://localhost:${PORT}`);
-      console.log(`Network access: https://${require('os').networkInterfaces().Ethernet?.[0]?.address || 'YOUR_IP'}:${PORT}`);
-      console.log(`\n⚠️  Your browser will show a security warning (self-signed certificate)`);
-      console.log(`   Click "Advanced" → "Proceed to site" to continue.`);
     });
   }
 } else {
   // HTTP mode (default)
   server = app.listen(PORT, HOST, () => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on ${HOST}:${PORT} (HTTP)`);
-    console.log(`Local access: http://localhost:${PORT}`);
-    console.log(`Network access: http://${require('os').networkInterfaces().Ethernet?.[0]?.address || 'YOUR_IP'}:${PORT}`);
   });
 }
 
